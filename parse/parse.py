@@ -19,30 +19,33 @@ class Parser(object):
         source_base_type = False
         target_base_type = False
 
-        print(f"deal {obj}")
+        print(f"parse {obj}")
 
         sym = obj['sym']
-        sym_target = obj['uses']
 
-        for ss in sym:
-            if ss in SCALA_BASE_TYPE:
-                source_base_type = True
+        if 'uses' in obj.keys():
+            sym_target = obj['uses']
 
-        for ss in sym_target:
-            if ss in SCALA_BASE_TYPE:
-                target_base_type = True
+            if len(sym) > 0:
+                for ss in sym:
+                    if ss in SCALA_BASE_TYPE:
+                        source_base_type = True
 
-        if source_base_type and not target_base_type:
-            self.parse_sym(sym_target)
+                for ss in sym_target:
+                    if ss in SCALA_BASE_TYPE:
+                        target_base_type = True
 
-        if not source_base_type and target_base_type:
-            self.parse_sym(sym)
+                if source_base_type and not target_base_type:
+                    self.parse_sym(sym_target)
 
-        if not source_base_type and not target_base_type:
-            source = self.parse_sym(sym)
-            target = self.parse_sym(sym_target)
-            rel = ParseResultRel("uses", source, target)
-            self.neo.update_rel(rel)
+                if not source_base_type and target_base_type:
+                    self.parse_sym(sym)
+
+                if not source_base_type and not target_base_type:
+                    source = self.parse_sym(sym)
+                    target = self.parse_sym(sym_target)
+                    rel = ParseResultRel("uses", source, target)
+                    self.neo.update_rel(rel)
 
     def parse_sym(self, syms):
 
@@ -63,3 +66,6 @@ class Parser(object):
             self.neo.update_rel(rel)
 
         return res[-1]
+
+
+
